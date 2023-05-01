@@ -11,18 +11,18 @@ const $image_url = $("#image_url");
 
 const $cupcakesList = $("#cupcakes-list");
 
+showCupcakesList();
 
 /**Async function that gets the list of cupcakes from the API
- * Displays the list of cupcakes on the dom
+ * Displays the list of cupcakes in the dom
  */
 async function showCupcakesList() {
   const response = await axios({
-    method: 'GET',
-    url: '/api/cupcakes'
+    method: "GET",
+    url: "/api/cupcakes",
   });
-  console.log(response)
+  console.log(response);
   const cupcakes = response.data.cupcakes;
-
 
   for (let cupcake of cupcakes) {
     displayCupcake(cupcake);
@@ -33,16 +33,29 @@ async function showCupcakesList() {
  * @param {Object} cupcake
  */
 function displayCupcake(cupcake) {
-  const $cupcakeImg = $(`<img src=${cupcake.image_url} height=${IMG_DIMENSION} width=${IMG_DIMENSION}>`);
-  const $cupcakeInfo = $(`<p>Flavor: ${cupcake.flavor}, Size: ${cupcake.size}, Rating: ${cupcake.rating}</p>`);
-  const $cupcake = $("<li></li>");
+  const $cupcake = $("<li>").html(`
+      <img src=${cupcake.image_url} height=${IMG_DIMENSION} width=${IMG_DIMENSION}>
+      <p>Flavor: ${cupcake.flavor}, Size: ${cupcake.size}, Rating: ${cupcake.rating}</p>
+  `);
 
-  $cupcake.append($cupcakeImg, $cupcakeInfo);
   $cupcakesList.append($cupcake);
 }
 
-function handleFormSubmit(evt) {
+/** Handles submission of new cupcake, appends and displays it on the cupcakes list, */
+async function handleFormSubmit(evt) {
+  evt.preventDefault();
 
+  const resp = await axios({
+    method: "POST",
+    url: "/api/cupcakes",
+    data: {
+      flavor: $flavor.val(),
+      size: $size.val(),
+      rating: $rating.val(),
+      image_url: $image_url.val(),
+    },
+  });
+  displayCupcake(resp.data.cupcake);
 }
 
-showCupcakesList();
+$cupcakeAddForm.on("submit", handleFormSubmit);
