@@ -5,7 +5,7 @@ import os
 from flask import Flask, render_template, redirect, flash, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from models import connect_db,Cupcake, db, DEFAULT_CUPCAKE_IMAGE_URL
+from models import connect_db, Cupcake, db, DEFAULT_CUPCAKE_IMAGE_URL
 
 
 app = Flask(__name__)
@@ -19,8 +19,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     "DATABASE_URL", "postgresql:///cupcakes")
 
 
-
 connect_db(app)
+
 
 @app.get("/api/cupcakes")
 def get_all_cupcakes():
@@ -35,6 +35,7 @@ def get_all_cupcakes():
 
     return jsonify(cupcakes=serialized)
 
+
 @app.get('/api/cupcakes/<int:cupcake_id>')
 def get_cupcake(cupcake_id):
     """return JSON of a single cupcake
@@ -46,7 +47,8 @@ def get_cupcake(cupcake_id):
     cupcake = Cupcake.query.get_or_404(cupcake_id)
     serialized = cupcake.serialize()
 
-    return jsonify(cupcake = serialized)
+    return jsonify(cupcake=serialized)
+
 
 @app.post('/api/cupcakes')
 def create_cupcake():
@@ -86,10 +88,10 @@ def update_cupcake(cupcake_id):
     cupcake.flavor = request.json.get('flavor', cupcake.flavor)
     cupcake.size = request.json.get('size', cupcake.size)
     cupcake.rating = request.json.get('rating', cupcake.rating)
-    cupcake.image_url = request.json.get('image_url')
+    cupcake.image_url = request.json.get('image_url') or DEFAULT_CUPCAKE_IMAGE_URL
 
-    if not cupcake.image_url:
-        cupcake.image_url = DEFAULT_CUPCAKE_IMAGE_URL
+    # if not cupcake.image_url:
+    #     cupcake.image_url = DEFAULT_CUPCAKE_IMAGE_URL
 
     db.session.commit()
 
@@ -98,4 +100,16 @@ def update_cupcake(cupcake_id):
     return jsonify(cupcake=serialized)
 
 
+@app.delete('/api/cupcakes/<int:cupcake_id>')
+def delete_cupcake(cupcake_id):
+    """Deletes cupcake and returns JSON
+    Responds with JSON like:
+    {deleted: [cupcake-id]}
+    """
 
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    db.session.delete(cupcake)
+    db.session.commit()
+
+    return jsonify(deleted=cupcake_id)
