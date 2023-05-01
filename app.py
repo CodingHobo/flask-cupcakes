@@ -5,7 +5,7 @@ import os
 from flask import Flask, render_template, redirect, flash, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-from models import connect_db,Cupcake, db
+from models import connect_db,Cupcake, db, DEFAULT_CUPCAKE_IMAGE_URL
 
 
 app = Flask(__name__)
@@ -24,6 +24,11 @@ connect_db(app)
 
 @app.get("/api/cupcakes")
 def get_all_cupcakes():
+    """return JSON of all the cupcakes
+
+    Returns JSON:
+    {cupcakes: [{id, flavor, size, rating, image_url}, ...]}
+    """
 
     cupcakes = Cupcake.query.all()
     serialized = [c.serialize() for c in cupcakes]
@@ -32,6 +37,11 @@ def get_all_cupcakes():
 
 @app.get('/api/cupcakes/<int:cupcake_id>')
 def get_cupcake(cupcake_id):
+    """return JSON of a single cupcake
+
+    Returns JSON:
+    {cupcake: {id, flavor, size, rating, image_url}}
+    """
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
     serialized = cupcake.serialize()
@@ -48,7 +58,7 @@ def create_cupcake():
     flavor = request.json['flavor']
     size = request.json['size']
     rating = request.json['rating']
-    image_url = request.json['image_url']
+    image_url = request.json['image_url'] or None
 
     new_cupcake = Cupcake(flavor=flavor,
                           size=size,
@@ -63,6 +73,29 @@ def create_cupcake():
     # Return w/status code 201 --- return tuple (json, status)
     return (jsonify(cupcake=serialized), 201)
 
+
+@app.patch("/api/cupcakes/<int:cupcake_id>")
+def update_cupcake(cupcake_id):
+    """Updates data on cupcake and returns JSON
+    Responds with JSON like:
+    {cupcake: {id, flavor, size, rating, image_url}}
+    """
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    cupcake.flavor = request.json.get('flavor', cupcake.flavor)
+    cupcake.size = request.json.get('size', cupcake.size)
+    cupcake.rating = request.json.get('rating', cupcake.rating)
+    cupcake.image_url = request.json.get('image_url')
+
+    if not cupcake.image_url:
+        cupcake.image_url = DEFAULT_CUPCAKE_IMAGE_URL
+
+    db.session.commit()
+
+    serialized = cupcake.serialize()
+
+    return jsonify(cupcake=serialized)
 
 
 
