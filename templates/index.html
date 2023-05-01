@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cupcakes</title>
+  <link
+    href="https://bootswatch.com/5/minty/bootstrap.css"
+    rel="stylesheet">
+</head>
+<body>
+  <main>
+    <h1>Cupcakes</h1>
+    <div>
+      <ul id="cupcakes-list"></ul>
+    </div>
+    <h3>Add a New Cupcake</h3>
+    <div>
+      <form id="cupcake-add-form">
+        <div class="mb-3">
+          <label for="flavor" class="form-label">Flavor</label>
+          <input type="text" class="form-control" id="flavor">
+        </div>
+        <div class="mb-3">
+          <label for="size" class="form-label">Size</label>
+          <input type="text" class="form-control" id="size">
+        </div>
+        <div class="mb-3">
+          <label for="rating" class="form-label">Rating</label>
+          <input type="number" class="form-control" id="rating">
+        </div>
+        <div class="mb-3">
+          <label for="image_url" class="form-label">Image URL</label>
+          <input type="text" class="form-control" id="image_url">
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+    </div>
+  </main>
+</body>
+<script src="http://unpkg.com/jquery"></script>
+<script src="https://unpkg.com/axios/dist/axios.js"></script>
+<script src="/static/cupcakes.js"></script>
+</html>

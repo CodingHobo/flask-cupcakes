@@ -21,6 +21,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
 
 connect_db(app)
 
+@app.get("/")
+def show_homepage():
+
+    return render_template("index.html")
 
 @app.get("/api/cupcakes")
 def get_all_cupcakes():
